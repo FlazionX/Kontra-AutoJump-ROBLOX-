@@ -27,3 +27,9 @@ jobs:
         shell: pwsh
         run: |
           if (!(Test-Path "dist/Kontra AutoJump.exe")) { throw "EXE was not created" }
+      - name: Upload Windows executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kontra-AutoJump-Windows
+          path: "dist/Kontra AutoJump.exe"
+          if-no-files-found: error
