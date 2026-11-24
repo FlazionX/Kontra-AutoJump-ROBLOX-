@@ -98,6 +98,7 @@ class KontraApp:
         self.settings = load_settings()
         self.controller = JumpController(self.settings["jump_key"])
         self.listener = None
+        self.hotkey_down = False
         self.closing = False
         self.root.title(APP_NAME)
         self.root.geometry("360x330")
@@ -168,8 +169,11 @@ class KontraApp:
         jump_box.bind("<<ComboboxSelected>>", self.settings_changed)
         hotkey_box.bind("<<ComboboxSelected>>", self.settings_changed)
 
-        tk.Label(self.root, text="F6 — включить / выключить удержание",
-                 bg=self.BG, fg=self.MUTED, font=("Segoe UI", 8)).pack(pady=(12, 0))
+        self.hotkey_hint = tk.Label(
+            self.root, text=f"{self.settings['hotkey']} — включить / выключить удержание",
+            bg=self.BG, fg=self.MUTED, font=("Segoe UI", 8)
+        )
+        self.hotkey_hint.pack(pady=(12, 0))
         tk.Label(self.root, text="Работает как обычный ввод клавиатуры Windows",
                  bg=self.BG, fg=self.MUTED, font=("Segoe UI", 8)).pack(pady=(3, 0))
 
@@ -178,7 +182,9 @@ class KontraApp:
             messagebox.showerror("Не найдена библиотека", "Установи зависимости командой:\n\npip install -r requirements.txt")
             return
         try:
-            self.listener = keyboard.Listener(on_press=self.on_global_key)
+            self.listener = keyboard.Listener(
+                on_press=self.on_global_key, on_release=self.on_global_key_release
+            )
             self.listener.start()
         except Exception as exc:
             messagebox.showerror("Ошибка клавиатуры", f"Не удалось запустить горячую клавишу:\n{exc}")
@@ -186,8 +192,16 @@ class KontraApp:
     def on_global_key(self, key):
         try:
             target = pynput_key(self.settings["hotkey"])
-            if key == target:
+            if key == target and not self.hotkey_down:
+                self.hotkey_down = True
                 self.root.after(0, self.toggle)
+        except Exception:
+            pass
+
+    def on_global_key_release(self, key):
+        try:
+            if key == pynput_key(self.settings["hotkey"]):
+                self.hotkey_down = False
         except Exception:
             pass
 
@@ -200,10 +214,13 @@ class KontraApp:
             self.hotkey_var.set(self.settings["hotkey"])
             return
         try:
-            was_active = self.controller.active
             self.controller.set_key(jump)
             self.settings["jump_key"] = jump
             self.settings["hotkey"] = hotkey
+            self.hotkey_down = False
+            self.hotkey_hint.configure(
+                text=f"{hotkey} — включить / выключить удержание"
+            )
             save_settings(self.settings)
             self.refresh_status()
         except Exception as exc:
