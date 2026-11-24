@@ -1,30 +1,25 @@
 # Kontra AutoJump
 
-A compact Windows desktop helper that holds a selected keyboard key until you turn it off.
+A compact Windows helper for Roblox that repeatedly taps Space while the user physically holds Space.
 
 ## Features
 
-- Toggle key holding with a configurable global hotkey (F6 by default).
-- Configure the held key and hotkey in the app.
-- Saves settings between launches.
-- Releases the held key when disabled or when the app closes.
-- Sends ordinary keyboard input; it does not inject code into a game or modify game files.
+- Click **Start**, focus Roblox, then hold Space to trigger repeated short Space taps.
+- Releasing Space stops the repeated taps.
+- Adjustable interval from 100 to 1500 ms (default: 450 ms).
+- Saves the selected interval in the user's AppData settings folder.
+- Uses ordinary Windows keyboard input; it does not inject code into Roblox or modify game files.
 
 ## Run from source
 
 1. Install Python 3.10 or newer.
-2. Open a terminal in this folder.
-3. Run `py -m pip install -r requirements.txt`.
-4. Run `py main.py`.
+2. Run `py -m pip install -r requirements.txt`.
+3. Run `py main.py`.
 
 ## Build a Windows EXE
 
 Double-click `build.bat`. The executable will be created at `dist\Kontra AutoJump.exe`.
 
-## Controls
+## Roblox timing note
 
-- F6 by default: toggle holding the selected key.
-- SPACE is the default held key.
-- Close the app to release the held key.
-
-Windows may show a security prompt for an unsigned executable. Only run builds you trust.
+Roblox does not define one universal jump interval. Each experience can implement its own jump cooldown. The default 450 ms is a starting point, not a guaranteed game-wide timing. Adjust it in the app if the experience needs a slower or faster cadence. The app cannot read the character's actual grounded/jump-ready state from outside the game.
