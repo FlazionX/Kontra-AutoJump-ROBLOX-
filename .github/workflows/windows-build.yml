@@ -19,6 +19,8 @@ jobs:
           pip install -r requirements.txt pyinstaller
       - name: Compile Python source
         run: python -m py_compile main.py
+      - name: Run controller tests
+        run: python -m unittest discover -s tests -v
       - name: Build executable
         run: pyinstaller --noconfirm --clean --onefile --windowed --name "Kontra AutoJump" --collect-all pynput main.py
       - name: Verify executable exists
